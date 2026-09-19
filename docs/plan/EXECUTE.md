@@ -56,7 +56,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 2 – Contacts UI (Milestone 2)
-### [ ] 2.1 App shell & theme
+### [x] 2.1 App shell & theme
 - Do: `MaterialApp` (M3, light/dark), Riverpod `ProviderScope`, bottom nav/drawer: Contacts, Today, Settings (placeholders).
 - Done when: app runs; navigation works; dark mode follows system.
 
