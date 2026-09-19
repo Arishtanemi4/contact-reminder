@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Runtime-requested on Android 13+; see NotificationService.requestPermission(). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Lets the boot receiver (Phase 5.5) reschedule alarms after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Exact-time reminders on Android 12+; falls back to inexact alarms if the
+         user doesn't grant it (see NotificationService.canScheduleExactAlarms()). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <application
         android:label="contact_reminder"
         android:name="${applicationName}"

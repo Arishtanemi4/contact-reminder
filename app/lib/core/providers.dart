@@ -12,6 +12,7 @@ import '../features/import_export/spreadsheet_service.dart';
 import '../features/import_export/xlsx_spreadsheet_service.dart';
 import 'action_launcher.dart';
 import 'clock.dart';
+import 'notification_service.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
@@ -33,6 +34,19 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 
 final actionLauncherProvider =
     Provider<ActionLauncher>((ref) => const ActionLauncher());
+
+/// Overridden with an already-`init()`-ed instance in `main.dart`.
+final notificationServiceProvider =
+    Provider<NotificationService>((ref) => NotificationService());
+
+/// Re-checked with `ref.invalidate` after the user acts on a permission button.
+final notificationsEnabledProvider = FutureProvider<bool>(
+  (ref) => ref.watch(notificationServiceProvider).notificationsEnabled(),
+);
+
+final exactAlarmsAllowedProvider = FutureProvider<bool>(
+  (ref) => ref.watch(notificationServiceProvider).canScheduleExactAlarms(),
+);
 
 final spreadsheetServiceProvider =
     Provider<SpreadsheetService>((ref) => const XlsxSpreadsheetService());
