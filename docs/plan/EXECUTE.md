@@ -44,7 +44,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: add `flutter_riverpod`, `drift`, `drift_flutter` (or `sqlite3_flutter_libs`), `path_provider`, `path`; dev: `drift_dev`, `build_runner`, `flutter_lints`. Create `lib/{core,data,features/{contacts,events,import_export,settings}}`.
 - Done when: `flutter pub get` OK; `flutter analyze` clean.
 
-### [ ] 1.3 Database schema
+### [x] 1.3 Database schema
 - Do: drift tables `groups`, `contacts`, `contact_phones`, `contact_events`, `settings` exactly as in PROJECT_PLAN; foreign keys ON with cascade delete; unique `(group_id, position)` where relevant; schema version 1 with `MigrationStrategy`; run `dart run build_runner build`.
 - Done when: generated code compiles; `analyze` clean.
 
