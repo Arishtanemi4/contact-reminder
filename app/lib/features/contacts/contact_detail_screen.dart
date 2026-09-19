@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
+import 'contact_form_screen.dart';
 
 const _monthNames = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -44,7 +45,21 @@ class _Detail extends StatelessWidget {
     final name =
         [contact.firstName, contact.surname].whereType<String>().join(' ');
     return Scaffold(
-      appBar: AppBar(title: Text(name)),
+      appBar: AppBar(
+        title: Text(name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit',
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => ContactFormScreen(
+                contactId: contact.id,
+                initialGroupId: contact.groupId,
+              ),
+            )),
+          ),
+        ],
+      ),
       body: ListView(
         children: [
           for (final phone in details.phones) _PhoneTile(phone: phone),

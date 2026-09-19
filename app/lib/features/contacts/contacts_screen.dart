@@ -6,6 +6,7 @@ import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
 import 'contact_detail_screen.dart';
+import 'contact_form_screen.dart';
 
 class ContactsScreen extends ConsumerWidget {
   const ContactsScreen({super.key});
@@ -72,6 +73,23 @@ class _GroupTabs extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final controller = DefaultTabController.of(context);
+            return AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) => FloatingActionButton(
+                tooltip: 'Add contact',
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => ContactFormScreen(
+                    initialGroupId: groups[controller.index].id,
+                  ),
+                )),
+                child: const Icon(Icons.add),
+              ),
+            );
+          },
         ),
       ),
     );
