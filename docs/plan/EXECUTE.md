@@ -65,7 +65,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: widget test with seeded in-memory DB shows tabs and list; search filters.
 - Done when: tests green; manually verified on emulator.
 
-### [ ] 2.3 Contact detail screen
+### [x] 2.3 Contact detail screen
 - Do: shows name, phones, events (age/years shown only if year known), email, address; action buttons are stubs for now.
 - Done when: widget test + manual check.
 
