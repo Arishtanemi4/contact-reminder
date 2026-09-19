@@ -188,7 +188,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ### [x] 7.3 App icon, app name, splash.
 ### [x] 7.4 Full regression: `flutter analyze`, `flutter test`, `cargo test` (N/A, Phase 6 skipped), manual checklist on Android 12/13/14 (import, add/edit, call/SMS/WhatsApp, Today/Tomorrow, notification after reboot).
 ### [x] 7.5 Release build: R8/minify, signing config (**ask the user; never generate/commit keys without approval**), build AAB/APK, install-test the release artifact.
-### [ ] 7.6 Docs: update README (features, how to build, xlsx format with sample), privacy note (data stays on device), known limitations (WhatsApp cannot start calls; OEM background limits).
+### [x] 7.6 Docs: update README (features, how to build, xlsx format with sample), privacy note (data stays on device), known limitations (WhatsApp cannot start calls; OEM background limits).
 - Done when (each): checks in that line pass and are reported to the user.
 
 ---
