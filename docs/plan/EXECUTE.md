@@ -125,7 +125,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 5 – Events & notifications (Milestone 5)
-### [ ] 5.1 EventCalculator
+### [x] 5.1 EventCalculator
 - Do: pure Dart `nextOccurrence(month, day, from)` (Feb 29 → Feb 28 in non-leap years), `eventsOn(date)`, `ageOrYears(year?, date)`; interface for later Rust swap.
 - Tests: year rollover, leap day, same-day, no-year, timezone/DST-insensitive (date-only).
 - Done when: tests green.
