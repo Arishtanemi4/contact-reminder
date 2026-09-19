@@ -4,6 +4,7 @@ import '../data/contact_repository.dart';
 import '../data/database.dart';
 import '../data/group_repository.dart';
 import '../data/settings_repository.dart';
+import '../features/import_export/export_service.dart';
 import '../features/import_export/import_service.dart';
 import '../features/import_export/spreadsheet_service.dart';
 import '../features/import_export/xlsx_spreadsheet_service.dart';
@@ -35,6 +36,10 @@ final spreadsheetServiceProvider =
 
 final importServiceProvider = Provider<ImportService>(
   (ref) => ImportService(ref.watch(databaseProvider)),
+);
+
+final exportServiceProvider = Provider<ExportService>(
+  (ref) => ExportService(ref.watch(databaseProvider)),
 );
 
 final groupsStreamProvider = StreamProvider<List<Group>>(

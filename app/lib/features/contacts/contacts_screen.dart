@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +22,12 @@ class ContactsScreen extends ConsumerWidget {
           ? Scaffold(
               appBar: AppBar(
                 title: const Text('Contacts'),
-                actions: const [_ImportButton(), _SeedButton()],
+                actions: const [
+                  _ImportButton(),
+                  _ExportButton(),
+                  _TemplateButton(),
+                  _SeedButton(),
+                ],
               ),
               body: const _EmptyState(),
             )
@@ -47,7 +53,12 @@ class _GroupTabs extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
-          actions: const [_ImportButton(), _SeedButton()],
+          actions: const [
+            _ImportButton(),
+            _ExportButton(),
+            _TemplateButton(),
+            _SeedButton(),
+          ],
           bottom: TabBar(
             isScrollable: true,
             tabs: [for (final g in groups) Tab(text: g.name)],
@@ -206,6 +217,61 @@ class _ImportButton extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const ImportScreen()),
       ),
     );
+  }
+}
+
+class _ExportButton extends ConsumerWidget {
+  const _ExportButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      icon: const Icon(Icons.ios_share),
+      tooltip: 'Export to .xlsx',
+      onPressed: () => _export(context, ref),
+    );
+  }
+
+  Future<void> _export(BuildContext context, WidgetRef ref) async {
+    final sheets = await ref.read(exportServiceProvider).export();
+    final bytes = ref.read(spreadsheetServiceProvider).build(sheets);
+    final saved = await FilePicker.saveFile(
+      fileName: 'contacts.xlsx',
+      bytes: bytes,
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    if (context.mounted && saved != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Exported')));
+    }
+  }
+}
+
+class _TemplateButton extends ConsumerWidget {
+  const _TemplateButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton(
+      icon: const Icon(Icons.description_outlined),
+      tooltip: 'Download blank template',
+      onPressed: () => _download(context, ref),
+    );
+  }
+
+  Future<void> _download(BuildContext context, WidgetRef ref) async {
+    final bytes = ref.read(spreadsheetServiceProvider).template();
+    final saved = await FilePicker.saveFile(
+      fileName: 'contacts_template.xlsx',
+      bytes: bytes,
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    if (context.mounted && saved != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Template saved')));
+    }
   }
 }
 

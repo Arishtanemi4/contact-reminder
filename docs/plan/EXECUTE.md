@@ -117,7 +117,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: `file_picker` (SAF, no storage permission), preview screen (sheets, counts, issues list), choose Merge/Replace, confirm, result summary.
 - Done when: importing a fixture on the emulator creates tabs + contacts; issues visible.
 
-### [ ] 4.6 Export + template
+### [x] 4.6 Export + template
 - Do: implement `build` and `template`; export via `share_plus` and/or SAF "save as"; "Download blank template" action.
 - Tests: round-trip — import fixture → export → re-import → equal data.
 - Done when: tests green; exported file opens in Excel/Sheets with correct layout.

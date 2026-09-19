@@ -149,4 +149,34 @@ void main() {
     expect(result.issues, hasLength(1));
     expect(result.issues.single.field, 'file');
   });
+
+  test('round-trip: import, build, re-import gives back the same data', () {
+    final original = service.parse(_fixture('valid_multi_sheet.xlsx'));
+    final reimported = service.parse(service.build(original.sheets));
+
+    expect(reimported.sheets.map((s) => s.name), original.sheets.map((s) => s.name));
+    expect(reimported.issues, isEmpty);
+    for (var i = 0; i < original.sheets.length; i++) {
+      final origRows = original.sheets[i].rows;
+      final newRows = reimported.sheets[i].rows;
+      expect(newRows, hasLength(origRows.length));
+      for (var r = 0; r < origRows.length; r++) {
+        expect(newRows[r].firstName, origRows[r].firstName);
+        expect(newRows[r].surname, origRows[r].surname);
+        expect(newRows[r].phones, origRows[r].phones);
+        expect(newRows[r].dob, origRows[r].dob);
+        expect(newRows[r].anniversary, origRows[r].anniversary);
+        expect(newRows[r].otherEvents, origRows[r].otherEvents);
+        expect(newRows[r].email, origRows[r].email);
+        expect(newRows[r].address, origRows[r].address);
+      }
+    }
+  });
+
+  test('template: header row only, no data rows', () {
+    final result = service.parse(service.template());
+    expect(result.issues, isEmpty);
+    expect(result.sheets, hasLength(1));
+    expect(result.sheets.single.rows, isEmpty);
+  });
 }

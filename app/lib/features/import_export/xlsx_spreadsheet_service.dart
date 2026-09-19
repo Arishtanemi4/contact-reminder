@@ -179,13 +179,70 @@ class XlsxSpreadsheetService implements SpreadsheetService {
 
   @override
   Uint8List build(List<ParsedSheet> sheets) {
-    // Implemented in step 4.6.
-    throw UnimplementedError();
+    final excel = xl.Excel.createExcel();
+    final defaultSheet = excel.getDefaultSheet();
+    for (final sheet in sheets) {
+      excel[sheet.name];
+      excel.appendRow(sheet.name, _headerRow());
+      for (final row in sheet.rows) {
+        excel.appendRow(sheet.name, _rowCells(row));
+      }
+    }
+    if (defaultSheet != null &&
+        sheets.isNotEmpty &&
+        !sheets.any((s) => s.name == defaultSheet)) {
+      excel.delete(defaultSheet);
+    }
+    return Uint8List.fromList(excel.encode()!);
   }
 
   @override
   Uint8List template() {
-    // Implemented in step 4.6.
-    throw UnimplementedError();
+    final excel = xl.Excel.createExcel();
+    final defaultSheet = excel.getDefaultSheet();
+    const sheetName = 'Contacts';
+    excel[sheetName];
+    excel.appendRow(sheetName, _headerRow());
+    if (defaultSheet != null && defaultSheet != sheetName) {
+      excel.delete(defaultSheet);
+    }
+    return Uint8List.fromList(excel.encode()!);
+  }
+
+  List<xl.CellValue?> _headerRow() =>
+      [for (final h in kSheetHeaders) xl.TextCellValue(h)];
+
+  List<xl.CellValue?> _rowCells(ParsedRow row) {
+    final phones = row.phones;
+    final events = row.otherEvents;
+    return [
+      _text(row.firstName),
+      _text(row.surname),
+      _text(phones.isNotEmpty ? phones[0] : null),
+      _text(phones.length > 1 ? phones[1] : null),
+      _text(phones.length > 2 ? phones[2] : null),
+      _date(row.dob),
+      _date(row.anniversary),
+      _text(events.isNotEmpty ? events[0].name : null),
+      _date(events.isNotEmpty ? events[0].date : null),
+      _text(events.length > 1 ? events[1].name : null),
+      _date(events.length > 1 ? events[1].date : null),
+      _text(events.length > 2 ? events[2].name : null),
+      _date(events.length > 2 ? events[2].date : null),
+      _text(row.email),
+      _text(row.address),
+    ];
+  }
+
+  xl.CellValue? _text(String? s) => s == null ? null : xl.TextCellValue(s);
+
+  /// Writes as dd/MM[/yyyy] (year omitted when unknown), the one format
+  /// [FlexibleDateParser] round-trips for both cases.
+  xl.CellValue? _date(ParsedDate? d) {
+    if (d == null) return null;
+    final day = d.day.toString().padLeft(2, '0');
+    final month = d.month.toString().padLeft(2, '0');
+    return xl.TextCellValue(
+        d.year != null ? '$day/$month/${d.year}' : '$day/$month');
   }
 }
