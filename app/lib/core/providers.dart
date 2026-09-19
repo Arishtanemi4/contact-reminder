@@ -12,6 +12,7 @@ import '../features/import_export/spreadsheet_service.dart';
 import '../features/import_export/xlsx_spreadsheet_service.dart';
 import 'action_launcher.dart';
 import 'clock.dart';
+import 'notification_scheduler.dart';
 import 'notification_service.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -103,3 +104,27 @@ final todayTomorrowProvider = Provider<AsyncValue<TodayTomorrow>>((ref) {
       .watch(contactsAllProvider)
       .whenData((contacts) => TodayTomorrow.build(contacts, today, calc));
 });
+
+final settingsStreamProvider = StreamProvider<Setting>(
+  (ref) => ref.watch(settingsRepositoryProvider).watch(),
+);
+
+final notificationSchedulerProvider = Provider<NotificationScheduler>(
+  (ref) => NotificationScheduler(
+    ref.watch(notificationServiceProvider),
+    ref.watch(eventCalculatorProvider),
+    ref.watch(clockProvider),
+  ),
+);
+
+/// Reschedules all notifications against the current contacts/settings, if
+/// both are loaded. Called from `HomeShell` via `ref.listen` (see there) so
+/// it reliably re-runs on every contacts/settings change; a `ref.watch`-only
+/// `Provider<void>` doesn't.
+void rescheduleNotifications(WidgetRef ref) {
+  final contacts = ref.read(contactsAllProvider).value;
+  final settings = ref.read(settingsStreamProvider).value;
+  if (contacts != null && settings != null) {
+    ref.read(notificationSchedulerProvider).rescheduleAll(contacts, settings);
+  }
+}

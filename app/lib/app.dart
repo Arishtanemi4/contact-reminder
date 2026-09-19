@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/providers.dart';
 import 'features/contacts/contacts_screen.dart';
 import 'features/events/today_screen.dart';
 import 'features/settings/settings_screen.dart';
@@ -23,14 +25,14 @@ class ContactReminderApp extends StatelessWidget {
 }
 
 /// Bottom-nav shell holding the three top-level tabs.
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  State<HomeShell> createState() => _HomeShellState();
+  ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
   static const _screens = [
@@ -41,6 +43,11 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Reschedules notifications whenever contacts or settings change (see
+    // rescheduleNotifications); ref.listen (not watch) so it fires on every
+    // change for the app's lifetime, independent of this widget's own rebuilds.
+    ref.listen(contactsAllProvider, (_, _) => rescheduleNotifications(ref));
+    ref.listen(settingsStreamProvider, (_, _) => rescheduleNotifications(ref));
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
