@@ -36,7 +36,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 1 – Scaffold & data (Milestone 1)
-### [ ] 1.1 Create Flutter project
+### [x] 1.1 Create Flutter project
 - Do: `flutter create --org <org> --project-name contact_reminder --platforms android app`; set minSdk 23 (raise to what plugins need), compileSdk latest; remove template counter code.
 - Done when: `flutter analyze` clean; `flutter run` shows a blank Material 3 app on emulator.
 
