@@ -154,7 +154,8 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 
 ---
 
-## Phase 6 – Rust core (Milestone 6, optional per decision)
+## Phase 6 – Rust core (Milestone 6, optional per decision) — SKIPPED
+> Skipped by user request on 2026-09-19; see Decision log. Steps below left unchecked/undone.
 ### [ ] 6.1 Rust toolchain check
 - Do: verify `rustup`, `cargo`, Android NDK, `cargo-ndk`, targets `aarch64-linux-android armv7-linux-androideabi x86_64-linux-android`; user installs if missing.
 - Done when: `cargo ndk --version` works.
@@ -182,7 +183,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 7 – Polish & release (Milestone 7)
-### [ ] 7.1 Settings screen completion (notify time, lead days, default country code, theme).
+### [x] 7.1 Settings screen completion (notify time, lead days, default country code, theme).
 ### [ ] 7.2 Accessibility & UX pass (labels, tap targets ≥48dp, large-font check, empty/error states, loading states).
 ### [ ] 7.3 App icon, app name, splash.
 ### [ ] 7.4 Full regression: `flutter analyze`, `flutter test`, `cargo test`, manual checklist on Android 12/13/14 (import, add/edit, call/SMS/WhatsApp, Today/Tomorrow, notification after reboot).
@@ -209,3 +210,4 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 | 2026-09-19 | All country codes supported: selectable default region in Settings (`settings.default_country_code` holds region/dial code), `+` numbers parse for any country | User: "include all possible country codes" |
 | 2026-09-19 | Package id `com.example.contactreminder` | User choice |
 | 2026-09-19 | Primary test device: Samsung Galaxy S24 (SM S921B, Android 16) over USB; SDK at E:\software\Android\Sdk; emulator Pixel_8 (API 34) optional | Device connected, licences accepted |
+| 2026-09-19 | Phase 6 (Rust core) skipped; Dart implementations of `SpreadsheetService`, `EventCalculator`, `PhoneNormalizer` remain the shipped implementations; proceed straight to Phase 7 | User: "Skip Phase 6" |

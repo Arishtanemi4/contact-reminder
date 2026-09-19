@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 import '../../core/providers.dart';
 
@@ -11,14 +12,137 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
-        children: const [_NotificationsSection(), _BatterySection()],
+        key: const Key('settingsList'),
+        children: const [
+          _GeneralSection(),
+          _NotificationsSection(),
+          _BatterySection(),
+        ],
       ),
     );
   }
 }
 
-/// Permission status + a manual test button. Other settings (notify time,
-/// lead days, default country code, theme) are added in 7.1.
+/// Notify time, lead days, default country code, theme.
+class _GeneralSection extends ConsumerWidget {
+  const _GeneralSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settingsAsync = ref.watch(settingsStreamProvider);
+    final settings = settingsAsync.value;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Text('General', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+        ListTile(
+          title: const Text('Reminder time'),
+          subtitle: Text(settings?.notifyTime ?? '…'),
+          trailing: const Icon(Icons.edit),
+          onTap: settings == null
+              ? null
+              : () => _pickTime(context, ref, settings.notifyTime),
+        ),
+        ListTile(
+          title: const Text('Remind me'),
+          trailing: settings == null
+              ? null
+              : DropdownButton<int>(
+                  value: settings.leadDays,
+                  items: [
+                    for (final d in const [0, 1, 2, 3, 5, 7])
+                      DropdownMenuItem(
+                        value: d,
+                        child: Text(_leadDaysLabel(d)),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref
+                          .read(settingsRepositoryProvider)
+                          .update(leadDays: value);
+                    }
+                  },
+                ),
+        ),
+        ListTile(
+          title: const Text('Default country'),
+          trailing: settings == null
+              ? null
+              : DropdownMenu<String>(
+                  initialSelection: settings.defaultCountryCode,
+                  enableFilter: true,
+                  requestFocusOnTap: true,
+                  menuHeight: 300,
+                  dropdownMenuEntries: [
+                    for (final code in IsoCode.values)
+                      DropdownMenuEntry(value: code.name, label: code.name),
+                  ],
+                  onSelected: (value) {
+                    if (value != null) {
+                      ref
+                          .read(settingsRepositoryProvider)
+                          .update(defaultCountryCode: value);
+                    }
+                  },
+                ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Row(
+            children: [
+              const Text('Theme'),
+              const SizedBox(width: 16),
+              Expanded(
+                child: SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'system', label: Text('System')),
+                    ButtonSegment(value: 'light', label: Text('Light')),
+                    ButtonSegment(value: 'dark', label: Text('Dark')),
+                  ],
+                  selected: {settings?.themeMode ?? 'system'},
+                  onSelectionChanged: settings == null
+                      ? null
+                      : (selection) => ref
+                            .read(settingsRepositoryProvider)
+                            .update(themeMode: selection.first),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _leadDaysLabel(int days) => days == 0
+      ? 'Same day'
+      : days == 1
+      ? '1 day before'
+      : '$days days before';
+
+  Future<void> _pickTime(
+    BuildContext context,
+    WidgetRef ref,
+    String current,
+  ) async {
+    final parts = current.split(':');
+    final initial = TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
+    final picked = await showTimePicker(context: context, initialTime: initial);
+    if (picked == null) return;
+    final formatted =
+        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+    await ref.read(settingsRepositoryProvider).update(notifyTime: formatted);
+  }
+}
+
+/// Permission status + a manual test button.
 class _NotificationsSection extends ConsumerWidget {
   const _NotificationsSection();
 
@@ -78,7 +202,8 @@ class _NotificationsSection extends ConsumerWidget {
         ListTile(
           title: const Text('Open notification settings'),
           trailing: const Icon(Icons.open_in_new),
-          onTap: () => ref.read(notificationServiceProvider).openSystemSettings(),
+          onTap: () =>
+              ref.read(notificationServiceProvider).openSystemSettings(),
         ),
         ListTile(
           title: const Text('Send test notification'),

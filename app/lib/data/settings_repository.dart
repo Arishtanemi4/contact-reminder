@@ -15,12 +15,13 @@ class SettingsRepository {
     String? notifyTime,
     String? defaultCountryCode,
     int? leadDays,
-  }) =>
-      (_db.update(_db.settings)..where((s) => s.id.equals(1))).write(
-        SettingsCompanion(
-          notifyTime: Value.absentIfNull(notifyTime),
-          defaultCountryCode: Value.absentIfNull(defaultCountryCode),
-          leadDays: Value.absentIfNull(leadDays),
-        ),
-      );
+    String? themeMode,
+  }) => (_db.update(_db.settings)..where((s) => s.id.equals(1))).write(
+    SettingsCompanion(
+      notifyTime: Value.absentIfNull(notifyTime),
+      defaultCountryCode: Value.absentIfNull(defaultCountryCode),
+      leadDays: Value.absentIfNull(leadDays),
+      themeMode: Value.absentIfNull(themeMode),
+    ),
+  );
 }

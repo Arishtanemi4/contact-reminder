@@ -6,11 +6,17 @@ import 'features/contacts/contacts_screen.dart';
 import 'features/events/today_screen.dart';
 import 'features/settings/settings_screen.dart';
 
-class ContactReminderApp extends StatelessWidget {
+class ContactReminderApp extends ConsumerWidget {
   const ContactReminderApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref
+        .watch(settingsStreamProvider)
+        .maybeWhen(
+          data: (s) => _themeModeFromString(s.themeMode),
+          orElse: () => ThemeMode.system,
+        );
     return MaterialApp(
       title: 'Contact Reminder',
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
@@ -19,10 +25,17 @@ class ContactReminderApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
       ),
+      themeMode: themeMode,
       home: const HomeShell(),
     );
   }
 }
+
+ThemeMode _themeModeFromString(String value) => switch (value) {
+  'light' => ThemeMode.light,
+  'dark' => ThemeMode.dark,
+  _ => ThemeMode.system,
+};
 
 /// Bottom-nav shell holding the three top-level tabs.
 class HomeShell extends ConsumerStatefulWidget {
@@ -35,11 +48,7 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
-  static const _screens = [
-    ContactsScreen(),
-    TodayScreen(),
-    SettingsScreen(),
-  ];
+  static const _screens = [ContactsScreen(), TodayScreen(), SettingsScreen()];
 
   @override
   Widget build(BuildContext context) {

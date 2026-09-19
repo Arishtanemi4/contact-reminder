@@ -18,14 +18,13 @@ void main() {
     List<String> phones = const ['+91 98765 43210'],
     List<EventInput> events = const [],
     String? surname,
-  }) =>
-      ContactInput(
-        groupId: groupId ?? friendsId,
-        firstName: first,
-        surname: surname,
-        phones: phones,
-        events: events,
-      );
+  }) => ContactInput(
+    groupId: groupId ?? friendsId,
+    firstName: first,
+    surname: surname,
+    phones: phones,
+    events: events,
+  );
 
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
@@ -39,35 +38,50 @@ void main() {
 
   group('contacts CRUD', () {
     test('create stores phones and events in order', () async {
-      final id = await contacts.create(input(
-        phones: ['111', ' ', '222'],
-        events: const [
-          EventInput(type: EventType.birthday, month: 2, day: 29),
-          EventInput(
-              type: EventType.anniversary, month: 6, day: 1, year: 2010),
-        ],
-      ));
+      final id = await contacts.create(
+        input(
+          phones: ['111', ' ', '222'],
+          events: const [
+            EventInput(type: EventType.birthday, month: 2, day: 29),
+            EventInput(
+              type: EventType.anniversary,
+              month: 6,
+              day: 1,
+              year: 2010,
+            ),
+          ],
+        ),
+      );
       final c = (await contacts.get(id))!;
       expect(c.contact.firstName, 'Asha');
-      expect(c.phones.map((p) => (p.position, p.numberRaw)),
-          [(1, '111'), (2, '222')]);
+      expect(c.phones.map((p) => (p.position, p.numberRaw)), [
+        (1, '111'),
+        (2, '222'),
+      ]);
       expect(c.events.length, 2);
-      expect(c.events.firstWhere((e) => e.type == EventType.birthday).year,
-          isNull);
+      expect(
+        c.events.firstWhere((e) => e.type == EventType.birthday).year,
+        isNull,
+      );
     });
 
     test('create populates numberE164 using the default region', () async {
-      final id = await contacts
-          .create(input(phones: ['098765 43210', 'not a number']));
+      final id = await contacts.create(
+        input(phones: ['098765 43210', 'not a number']),
+      );
       final c = (await contacts.get(id))!;
       expect(c.phones[0].numberE164, '+919876543210');
       expect(c.phones[1].numberE164, isNull);
     });
 
     test('update replaces phones and events', () async {
-      final id = await contacts.create(input(
-        events: const [EventInput(type: EventType.birthday, month: 1, day: 2)],
-      ));
+      final id = await contacts.create(
+        input(
+          events: const [
+            EventInput(type: EventType.birthday, month: 1, day: 2),
+          ],
+        ),
+      );
       await contacts.update(id, input(first: 'Asha2', phones: ['999']));
       final c = (await contacts.get(id))!;
       expect(c.contact.firstName, 'Asha2');
@@ -83,17 +97,23 @@ void main() {
 
     test('update of missing validation keeps old data (transaction)', () async {
       final id = await contacts.create(input());
-      expect(() => contacts.update(id, input(phones: [])),
-          throwsA(isA<ValidationException>()));
+      expect(
+        () => contacts.update(id, input(phones: [])),
+        throwsA(isA<ValidationException>()),
+      );
       expect((await contacts.get(id))!.phones.length, 1);
     });
   });
 
   group('cascade delete', () {
     test('deleting a contact removes phones and events', () async {
-      final id = await contacts.create(input(
-        events: const [EventInput(type: EventType.birthday, month: 1, day: 2)],
-      ));
+      final id = await contacts.create(
+        input(
+          events: const [
+            EventInput(type: EventType.birthday, month: 1, day: 2),
+          ],
+        ),
+      );
       await contacts.delete(id);
       expect(await db.select(db.contactPhones).get(), isEmpty);
       expect(await db.select(db.contactEvents).get(), isEmpty);
@@ -109,18 +129,24 @@ void main() {
 
   group('validation', () {
     test('first name required', () {
-      expect(() => contacts.create(input(first: '  ')),
-          throwsA(isA<ValidationException>()));
+      expect(
+        () => contacts.create(input(first: '  ')),
+        throwsA(isA<ValidationException>()),
+      );
     });
 
     test('at least one phone', () {
-      expect(() => contacts.create(input(phones: ['', '  '])),
-          throwsA(isA<ValidationException>()));
+      expect(
+        () => contacts.create(input(phones: ['', '  '])),
+        throwsA(isA<ValidationException>()),
+      );
     });
 
     test('at most three phones', () {
-      expect(() => contacts.create(input(phones: ['1', '2', '3', '4'])),
-          throwsA(isA<ValidationException>()));
+      expect(
+        () => contacts.create(input(phones: ['1', '2', '3', '4'])),
+        throwsA(isA<ValidationException>()),
+      );
     });
 
     test('nothing is written when validation fails', () async {
@@ -134,10 +160,15 @@ void main() {
 
     test('db rejects out-of-range month', () {
       expect(
-          () => contacts.create(input(events: const [
-                EventInput(type: EventType.other, month: 13, day: 1),
-              ])),
-          throwsA(anything));
+        () => contacts.create(
+          input(
+            events: const [
+              EventInput(type: EventType.other, month: 13, day: 1),
+            ],
+          ),
+        ),
+        throwsA(anything),
+      );
     });
   });
 
@@ -157,11 +188,12 @@ void main() {
           .watchByGroup(friendsId)
           .map((l) => l.map((d) => d.contact.firstName).toList());
       final expectation = expectLater(
-          emissions,
-          emitsInOrder([
-            ['Amit'],
-            ['Bina'],
-          ]));
+        emissions,
+        emitsInOrder([
+          ['Amit'],
+          ['Bina'],
+        ]),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 50));
       await contacts.update(id, input(first: 'Bina'));
       await expectation;
@@ -169,12 +201,13 @@ void main() {
 
     test('search by name, surname, email-less, and phone digits', () async {
       await contacts.create(input(first: 'Asha', surname: 'Patil'));
-      await contacts.create(
-          input(first: 'Ravi', phones: ['+44 7700 900123']));
+      await contacts.create(input(first: 'Ravi', phones: ['+44 7700 900123']));
       expect((await contacts.search('pat')).single.contact.firstName, 'Asha');
       expect((await contacts.search('ASHA')).length, 1);
-      expect((await contacts.search('7700900')).single.contact.firstName,
-          'Ravi');
+      expect(
+        (await contacts.search('7700900')).single.contact.firstName,
+        'Ravi',
+      );
       expect(await contacts.search('nobody'), isEmpty);
       expect((await contacts.search('')).length, 2);
     });
@@ -188,14 +221,8 @@ void main() {
 
     test('watchOne emits the contact, then null after delete', () async {
       final id = await contacts.create(input());
-      final emissions =
-          contacts.watchOne(id).map((d) => d?.contact.firstName);
-      final expectation = expectLater(
-          emissions,
-          emitsInOrder([
-            'Asha',
-            null,
-          ]));
+      final emissions = contacts.watchOne(id).map((d) => d?.contact.firstName);
+      final expectation = expectLater(emissions, emitsInOrder(['Asha', null]));
       await Future<void>.delayed(const Duration(milliseconds: 50));
       await contacts.delete(id);
       await expectation;
@@ -210,11 +237,17 @@ void main() {
     test('new groups append and reorder rewrites sort order', () async {
       final b = await groups.create('Relatives');
       final c = await groups.create('Office');
-      expect((await groups.watchAll().first).map((g) => g.name),
-          ['Friends', 'Relatives', 'Office']);
+      expect((await groups.watchAll().first).map((g) => g.name), [
+        'Friends',
+        'Relatives',
+        'Office',
+      ]);
       await groups.reorder([c.id, friendsId, b.id]);
-      expect((await groups.watchAll().first).map((g) => g.name),
-          ['Office', 'Friends', 'Relatives']);
+      expect((await groups.watchAll().first).map((g) => g.name), [
+        'Office',
+        'Friends',
+        'Relatives',
+      ]);
     });
 
     test('duplicate name rejected', () {
@@ -230,15 +263,24 @@ void main() {
   group('settings', () {
     test('defaults are seeded', () async {
       final s = await settings.get();
-      expect((s.notifyTime, s.defaultCountryCode, s.leadDays),
-          ('08:00', 'IN', 0));
+      expect(
+        (s.notifyTime, s.defaultCountryCode, s.leadDays, s.themeMode),
+        ('08:00', 'IN', 0, 'system'),
+      );
     });
 
     test('partial update', () async {
       await settings.update(notifyTime: '07:30', leadDays: 1);
       final s = await settings.get();
-      expect((s.notifyTime, s.defaultCountryCode, s.leadDays),
-          ('07:30', 'IN', 1));
+      expect(
+        (s.notifyTime, s.defaultCountryCode, s.leadDays, s.themeMode),
+        ('07:30', 'IN', 1, 'system'),
+      );
+    });
+
+    test('theme mode update', () async {
+      await settings.update(themeMode: 'dark');
+      expect((await settings.get()).themeMode, 'dark');
     });
   });
 }

@@ -67,6 +67,7 @@ Setting _settings({String notifyTime = '08:00', int leadDays = 0}) => Setting(
   notifyTime: notifyTime,
   defaultCountryCode: 'IN',
   leadDays: leadDays,
+  themeMode: 'system',
 );
 
 void main() {

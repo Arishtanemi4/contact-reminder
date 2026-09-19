@@ -27,14 +27,15 @@ class ContactPhones extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get contactId =>
       integer().references(Contacts, #id, onDelete: KeyAction.cascade)();
-  IntColumn get position => integer().customConstraint('NOT NULL CHECK (position BETWEEN 1 AND 3)')();
+  IntColumn get position =>
+      integer().customConstraint('NOT NULL CHECK (position BETWEEN 1 AND 3)')();
   TextColumn get numberRaw => text()();
   TextColumn get numberE164 => text().nullable()();
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {contactId, position},
-      ];
+    {contactId, position},
+  ];
 }
 
 class ContactEvents extends Table {
@@ -43,39 +44,53 @@ class ContactEvents extends Table {
       integer().references(Contacts, #id, onDelete: KeyAction.cascade)();
   TextColumn get type => textEnum<EventType>()();
   TextColumn get label => text().nullable()();
-  IntColumn get month => integer().customConstraint('NOT NULL CHECK (month BETWEEN 1 AND 12)')();
-  IntColumn get day => integer().customConstraint('NOT NULL CHECK (day BETWEEN 1 AND 31)')();
+  IntColumn get month =>
+      integer().customConstraint('NOT NULL CHECK (month BETWEEN 1 AND 12)')();
+  IntColumn get day =>
+      integer().customConstraint('NOT NULL CHECK (day BETWEEN 1 AND 31)')();
   IntColumn get year => integer().nullable()();
 }
 
 /// Single-row table (id is always 1).
 class Settings extends Table {
-  IntColumn get id => integer().withDefault(const Constant(1)).customConstraint('NOT NULL DEFAULT 1 CHECK (id = 1)')();
+  IntColumn get id => integer()
+      .withDefault(const Constant(1))
+      .customConstraint('NOT NULL DEFAULT 1 CHECK (id = 1)')();
   TextColumn get notifyTime => text().withDefault(const Constant('08:00'))();
   TextColumn get defaultCountryCode =>
       text().withDefault(const Constant('IN'))();
   IntColumn get leadDays => integer().withDefault(const Constant(0))();
 
+  /// One of 'system', 'light', 'dark'.
+  TextColumn get themeMode => text().withDefault(const Constant('system'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Groups, Contacts, ContactPhones, ContactEvents, Settings])
+@DriftDatabase(
+  tables: [Groups, Contacts, ContactPhones, ContactEvents, Settings],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
-      : super(executor ?? driftDatabase(name: 'contact_reminder'));
+    : super(executor ?? driftDatabase(name: 'contact_reminder'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          await into(settings).insert(SettingsCompanion.insert());
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+      await into(settings).insert(SettingsCompanion.insert());
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(settings, settings.themeMode);
+      }
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 }

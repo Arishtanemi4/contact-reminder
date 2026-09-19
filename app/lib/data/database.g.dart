@@ -1616,12 +1616,25 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _themeModeMeta = const VerificationMeta(
+    'themeMode',
+  );
+  @override
+  late final GeneratedColumn<String> themeMode = GeneratedColumn<String>(
+    'theme_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('system'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     notifyTime,
     defaultCountryCode,
     leadDays,
+    themeMode,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1659,6 +1672,12 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         leadDays.isAcceptableOrUnknown(data['lead_days']!, _leadDaysMeta),
       );
     }
+    if (data.containsKey('theme_mode')) {
+      context.handle(
+        _themeModeMeta,
+        themeMode.isAcceptableOrUnknown(data['theme_mode']!, _themeModeMeta),
+      );
+    }
     return context;
   }
 
@@ -1684,6 +1703,10 @@ class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
         DriftSqlType.int,
         data['${effectivePrefix}lead_days'],
       )!,
+      themeMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}theme_mode'],
+      )!,
     );
   }
 
@@ -1698,11 +1721,15 @@ class Setting extends DataClass implements Insertable<Setting> {
   final String notifyTime;
   final String defaultCountryCode;
   final int leadDays;
+
+  /// One of 'system', 'light', 'dark'.
+  final String themeMode;
   const Setting({
     required this.id,
     required this.notifyTime,
     required this.defaultCountryCode,
     required this.leadDays,
+    required this.themeMode,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1711,6 +1738,7 @@ class Setting extends DataClass implements Insertable<Setting> {
     map['notify_time'] = Variable<String>(notifyTime);
     map['default_country_code'] = Variable<String>(defaultCountryCode);
     map['lead_days'] = Variable<int>(leadDays);
+    map['theme_mode'] = Variable<String>(themeMode);
     return map;
   }
 
@@ -1720,6 +1748,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       notifyTime: Value(notifyTime),
       defaultCountryCode: Value(defaultCountryCode),
       leadDays: Value(leadDays),
+      themeMode: Value(themeMode),
     );
   }
 
@@ -1735,6 +1764,7 @@ class Setting extends DataClass implements Insertable<Setting> {
         json['defaultCountryCode'],
       ),
       leadDays: serializer.fromJson<int>(json['leadDays']),
+      themeMode: serializer.fromJson<String>(json['themeMode']),
     );
   }
   @override
@@ -1745,6 +1775,7 @@ class Setting extends DataClass implements Insertable<Setting> {
       'notifyTime': serializer.toJson<String>(notifyTime),
       'defaultCountryCode': serializer.toJson<String>(defaultCountryCode),
       'leadDays': serializer.toJson<int>(leadDays),
+      'themeMode': serializer.toJson<String>(themeMode),
     };
   }
 
@@ -1753,11 +1784,13 @@ class Setting extends DataClass implements Insertable<Setting> {
     String? notifyTime,
     String? defaultCountryCode,
     int? leadDays,
+    String? themeMode,
   }) => Setting(
     id: id ?? this.id,
     notifyTime: notifyTime ?? this.notifyTime,
     defaultCountryCode: defaultCountryCode ?? this.defaultCountryCode,
     leadDays: leadDays ?? this.leadDays,
+    themeMode: themeMode ?? this.themeMode,
   );
   Setting copyWithCompanion(SettingsCompanion data) {
     return Setting(
@@ -1769,6 +1802,7 @@ class Setting extends DataClass implements Insertable<Setting> {
           ? data.defaultCountryCode.value
           : this.defaultCountryCode,
       leadDays: data.leadDays.present ? data.leadDays.value : this.leadDays,
+      themeMode: data.themeMode.present ? data.themeMode.value : this.themeMode,
     );
   }
 
@@ -1778,13 +1812,15 @@ class Setting extends DataClass implements Insertable<Setting> {
           ..write('id: $id, ')
           ..write('notifyTime: $notifyTime, ')
           ..write('defaultCountryCode: $defaultCountryCode, ')
-          ..write('leadDays: $leadDays')
+          ..write('leadDays: $leadDays, ')
+          ..write('themeMode: $themeMode')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, notifyTime, defaultCountryCode, leadDays);
+  int get hashCode =>
+      Object.hash(id, notifyTime, defaultCountryCode, leadDays, themeMode);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1792,7 +1828,8 @@ class Setting extends DataClass implements Insertable<Setting> {
           other.id == this.id &&
           other.notifyTime == this.notifyTime &&
           other.defaultCountryCode == this.defaultCountryCode &&
-          other.leadDays == this.leadDays);
+          other.leadDays == this.leadDays &&
+          other.themeMode == this.themeMode);
 }
 
 class SettingsCompanion extends UpdateCompanion<Setting> {
@@ -1800,23 +1837,27 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
   final Value<String> notifyTime;
   final Value<String> defaultCountryCode;
   final Value<int> leadDays;
+  final Value<String> themeMode;
   const SettingsCompanion({
     this.id = const Value.absent(),
     this.notifyTime = const Value.absent(),
     this.defaultCountryCode = const Value.absent(),
     this.leadDays = const Value.absent(),
+    this.themeMode = const Value.absent(),
   });
   SettingsCompanion.insert({
     this.id = const Value.absent(),
     this.notifyTime = const Value.absent(),
     this.defaultCountryCode = const Value.absent(),
     this.leadDays = const Value.absent(),
+    this.themeMode = const Value.absent(),
   });
   static Insertable<Setting> custom({
     Expression<int>? id,
     Expression<String>? notifyTime,
     Expression<String>? defaultCountryCode,
     Expression<int>? leadDays,
+    Expression<String>? themeMode,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1824,6 +1865,7 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
       if (defaultCountryCode != null)
         'default_country_code': defaultCountryCode,
       if (leadDays != null) 'lead_days': leadDays,
+      if (themeMode != null) 'theme_mode': themeMode,
     });
   }
 
@@ -1832,12 +1874,14 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     Value<String>? notifyTime,
     Value<String>? defaultCountryCode,
     Value<int>? leadDays,
+    Value<String>? themeMode,
   }) {
     return SettingsCompanion(
       id: id ?? this.id,
       notifyTime: notifyTime ?? this.notifyTime,
       defaultCountryCode: defaultCountryCode ?? this.defaultCountryCode,
       leadDays: leadDays ?? this.leadDays,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -1856,6 +1900,9 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
     if (leadDays.present) {
       map['lead_days'] = Variable<int>(leadDays.value);
     }
+    if (themeMode.present) {
+      map['theme_mode'] = Variable<String>(themeMode.value);
+    }
     return map;
   }
 
@@ -1865,7 +1912,8 @@ class SettingsCompanion extends UpdateCompanion<Setting> {
           ..write('id: $id, ')
           ..write('notifyTime: $notifyTime, ')
           ..write('defaultCountryCode: $defaultCountryCode, ')
-          ..write('leadDays: $leadDays')
+          ..write('leadDays: $leadDays, ')
+          ..write('themeMode: $themeMode')
           ..write(')'))
         .toString();
   }
@@ -3390,12 +3438,14 @@ typedef $$SettingsTableCreateCompanionBuilder = SettingsCompanion Function({
   Value<String> notifyTime,
   Value<String> defaultCountryCode,
   Value<int> leadDays,
+  Value<String> themeMode,
 });
 typedef $$SettingsTableUpdateCompanionBuilder = SettingsCompanion Function({
   Value<int> id,
   Value<String> notifyTime,
   Value<String> defaultCountryCode,
   Value<int> leadDays,
+  Value<String> themeMode,
 });
 
 class $$SettingsTableFilterComposer
@@ -3424,6 +3474,11 @@ class $$SettingsTableFilterComposer
 
   ColumnFilters<int> get leadDays => $composableBuilder(
     column: $table.leadDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get themeMode => $composableBuilder(
+    column: $table.themeMode,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3456,6 +3511,11 @@ class $$SettingsTableOrderingComposer
     column: $table.leadDays,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get themeMode => $composableBuilder(
+    column: $table.themeMode,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableAnnotationComposer
@@ -3482,6 +3542,9 @@ class $$SettingsTableAnnotationComposer
 
   GeneratedColumn<int> get leadDays =>
       $composableBuilder(column: $table.leadDays, builder: (column) => column);
+
+  GeneratedColumn<String> get themeMode =>
+      $composableBuilder(column: $table.themeMode, builder: (column) => column);
 }
 
 class $$SettingsTableTableManager
@@ -3516,11 +3579,13 @@ class $$SettingsTableTableManager
                 Value<String> notifyTime = const Value.absent(),
                 Value<String> defaultCountryCode = const Value.absent(),
                 Value<int> leadDays = const Value.absent(),
+                Value<String> themeMode = const Value.absent(),
               }) => SettingsCompanion(
                 id: id,
                 notifyTime: notifyTime,
                 defaultCountryCode: defaultCountryCode,
                 leadDays: leadDays,
+                themeMode: themeMode,
               ),
           createCompanionCallback:
               ({
@@ -3528,11 +3593,13 @@ class $$SettingsTableTableManager
                 Value<String> notifyTime = const Value.absent(),
                 Value<String> defaultCountryCode = const Value.absent(),
                 Value<int> leadDays = const Value.absent(),
+                Value<String> themeMode = const Value.absent(),
               }) => SettingsCompanion.insert(
                 id: id,
                 notifyTime: notifyTime,
                 defaultCountryCode: defaultCountryCode,
                 leadDays: leadDays,
+                themeMode: themeMode,
               ),
           withReferenceMapper: (p0) => p0
               .map(
