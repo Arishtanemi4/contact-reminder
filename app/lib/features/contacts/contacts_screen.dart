@@ -121,7 +121,11 @@ class _GroupContactList extends ConsumerWidget {
     final contactsAsync = ref.watch(contactsByGroupProvider(groupId));
     return contactsAsync.when(
       data: (contacts) => contacts.isEmpty
-          ? const _EmptyState()
+          ? _EmptyState(
+              message: ref.watch(searchQueryProvider).isEmpty
+                  ? 'Import a file or add a contact.'
+                  : 'No contacts match your search.',
+            )
           : ListView.builder(
               itemCount: contacts.length,
               itemBuilder: (context, index) {
@@ -276,11 +280,13 @@ class _TemplateButton extends ConsumerWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  const _EmptyState({this.message = 'Import a file or add a contact.'});
+
+  final String message;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Import a file or add a contact.'));
+    return Center(child: Text(message));
   }
 }
 

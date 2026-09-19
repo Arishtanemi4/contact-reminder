@@ -291,6 +291,7 @@ class _ContactFormState extends ConsumerState<_ContactForm> {
         if (_phones.length > 1)
           IconButton(
             icon: const Icon(Icons.close),
+            tooltip: 'Remove phone number',
             onPressed: () => setState(() {
               final c = _phones.removeAt(index);
               c.dispose();
@@ -319,7 +320,11 @@ class _ContactFormState extends ConsumerState<_ContactForm> {
         Row(
           children: [
             Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.w500))),
-            IconButton(icon: const Icon(Icons.close), onPressed: onRemove),
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Remove $title',
+              onPressed: onRemove,
+            ),
           ],
         ),
         _eventEditor(field, includeLabel: false, onRemove: null),
@@ -350,34 +355,53 @@ class _ContactFormState extends ConsumerState<_ContactForm> {
                   ),
                 ),
                 if (onRemove != null)
-                  IconButton(icon: const Icon(Icons.close), onPressed: onRemove),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    tooltip: 'Remove event',
+                    onPressed: onRemove,
+                  ),
               ],
             ),
-          Row(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 4,
             children: [
-              DropdownButton<int>(
-                value: field.month,
-                items: [
-                  for (var m = 1; m <= 12; m++)
-                    DropdownMenuItem(value: m, child: Text(_monthNames[m - 1])),
-                ],
-                onChanged: (v) => setState(() => field.month = v!),
+              Semantics(
+                label: 'Month',
+                child: DropdownButton<int>(
+                  value: field.month,
+                  items: [
+                    for (var m = 1; m <= 12; m++)
+                      DropdownMenuItem(value: m, child: Text(_monthNames[m - 1])),
+                  ],
+                  onChanged: (v) => setState(() => field.month = v!),
+                ),
               ),
-              const SizedBox(width: 8),
-              DropdownButton<int>(
-                value: field.day,
-                items: [
-                  for (var d = 1; d <= 31; d++)
-                    DropdownMenuItem(value: d, child: Text('$d')),
-                ],
-                onChanged: (v) => setState(() => field.day = v!),
+              Semantics(
+                label: 'Day',
+                child: DropdownButton<int>(
+                  value: field.day,
+                  items: [
+                    for (var d = 1; d <= 31; d++)
+                      DropdownMenuItem(value: d, child: Text('$d')),
+                  ],
+                  onChanged: (v) => setState(() => field.day = v!),
+                ),
               ),
-              const SizedBox(width: 16),
-              const Text('Year known'),
-              Switch(
-                value: yearKnown,
-                onChanged: (v) => setState(
-                    () => field.year = v ? DateTime.now().year : null),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Year known'),
+                  Semantics(
+                    label: 'Year known',
+                    child: Switch(
+                      value: yearKnown,
+                      onChanged: (v) => setState(
+                          () => field.year = v ? DateTime.now().year : null),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
