@@ -177,6 +177,25 @@ void main() {
       final list = await contacts.watchByGroup(friendsId, query: 'rav').first;
       expect(list.single.contact.firstName, 'Ravi');
     });
+
+    test('watchOne emits the contact, then null after delete', () async {
+      final id = await contacts.create(input());
+      final emissions =
+          contacts.watchOne(id).map((d) => d?.contact.firstName);
+      final expectation = expectLater(
+          emissions,
+          emitsInOrder([
+            'Asha',
+            null,
+          ]));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await contacts.delete(id);
+      await expectation;
+    });
+
+    test('watchOne on an unknown id is null', () async {
+      expect(await contacts.watchOne(999).first, isNull);
+    });
   });
 
   group('groups', () {

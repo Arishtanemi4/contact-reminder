@@ -44,3 +44,8 @@ final contactsByGroupProvider =
       .watch(contactRepositoryProvider)
       .watchByGroup(groupId, query: query.isEmpty ? null : query);
 });
+
+final contactDetailProvider =
+    StreamProvider.family<ContactWithDetails?, int>((ref, contactId) {
+  return ref.watch(contactRepositoryProvider).watchOne(contactId);
+});

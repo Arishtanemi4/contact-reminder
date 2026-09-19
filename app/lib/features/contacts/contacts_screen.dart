@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
+import 'contact_detail_screen.dart';
 
 class ContactsScreen extends ConsumerWidget {
   const ContactsScreen({super.key});
@@ -100,6 +101,10 @@ class _GroupContactList extends ConsumerWidget {
                   subtitle: details.phones.isEmpty
                       ? null
                       : Text(details.phones.first.numberRaw),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) =>
+                        ContactDetailScreen(contactId: details.contact.id),
+                  )),
                 );
               },
             ),

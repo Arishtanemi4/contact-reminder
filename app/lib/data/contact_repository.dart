@@ -114,6 +114,16 @@ class ContactRepository {
     return (await _withDetails([contact])).first;
   }
 
+  /// A single contact with its phones/events, updating as it (or its
+  /// children) change.
+  Stream<ContactWithDetails?> watchOne(int id) {
+    final q = _db.select(_db.contacts)..where((c) => c.id.equals(id));
+    return q.watchSingleOrNull().asyncMap((contact) async {
+      if (contact == null) return null;
+      return (await _withDetails([contact])).first;
+    });
+  }
+
   /// Contacts of one group ordered by name; optional [query] matches name, email or phone.
   Stream<List<ContactWithDetails>> watchByGroup(int groupId, {String? query}) {
     final q = _db.select(_db.contacts)
