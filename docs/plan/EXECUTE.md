@@ -21,7 +21,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 0 – Environment & repo
-### [ ] 0.1 Check toolchain
+### [x] 0.1 Check toolchain
 - Do: `flutter --version`, `flutter doctor -v`, `java -version`, `adb --version`, list AVDs (`emulator -list-avds`). Later (Phase 6) also `rustc --version`, `cargo --version`.
 - Done when: Flutter stable + Android SDK + a working emulator or connected device are confirmed. Missing tools are listed to the user with install instructions (user installs; do not silently install global tools).
 
@@ -208,3 +208,4 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 | 2026-09-19 | Other events = Name+Date pairs x3; Merge is default re-import | User choice |
 | 2026-09-19 | All country codes supported: selectable default region in Settings (`settings.default_country_code` holds region/dial code), `+` numbers parse for any country | User: "include all possible country codes" |
 | 2026-09-19 | Package id `com.example.contactreminder` | User choice |
+| 2026-09-19 | Primary test device: Samsung Galaxy S24 (SM S921B, Android 16) over USB; SDK at E:\software\Android\Sdk; emulator Pixel_8 (API 34) optional | Device connected, licences accepted |
