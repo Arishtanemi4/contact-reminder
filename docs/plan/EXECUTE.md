@@ -130,7 +130,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: year rollover, leap day, same-day, no-year, timezone/DST-insensitive (date-only).
 - Done when: tests green.
 
-### [ ] 5.2 Today & Tomorrow screen
+### [x] 5.2 Today & Tomorrow screen
 - Do: query all events, group into Today / Tomorrow; show type icon, name, age/years if known; "Send wishes" (WhatsApp/SMS with prefilled text); empty state.
 - Tests: widget test with seeded dates and a fake clock (inject `Clock`).
 - Done when: tests green; manual check.

@@ -143,6 +143,16 @@ class ContactRepository {
     });
   }
 
+  /// Every contact across all groups, with phones/events, updating as they change.
+  Stream<List<ContactWithDetails>> watchAll() {
+    final q = _db.select(_db.contacts)
+      ..orderBy([
+        (c) => OrderingTerm.asc(c.firstName),
+        (c) => OrderingTerm.asc(c.surname),
+      ]);
+    return q.watch().asyncMap(_withDetails);
+  }
+
   /// Search across all groups.
   Future<List<ContactWithDetails>> search(String query) async {
     final contacts = await (_db.select(_db.contacts)

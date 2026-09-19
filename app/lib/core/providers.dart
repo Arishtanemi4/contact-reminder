@@ -4,11 +4,14 @@ import '../data/contact_repository.dart';
 import '../data/database.dart';
 import '../data/group_repository.dart';
 import '../data/settings_repository.dart';
+import '../features/events/event_calculator.dart';
+import '../features/events/today_tomorrow.dart';
 import '../features/import_export/export_service.dart';
 import '../features/import_export/import_service.dart';
 import '../features/import_export/spreadsheet_service.dart';
 import '../features/import_export/xlsx_spreadsheet_service.dart';
 import 'action_launcher.dart';
+import 'clock.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
@@ -67,4 +70,22 @@ final contactsByGroupProvider =
 final contactDetailProvider =
     StreamProvider.family<ContactWithDetails?, int>((ref, contactId) {
   return ref.watch(contactRepositoryProvider).watchOne(contactId);
+});
+
+final clockProvider = Provider<Clock>((ref) => const SystemClock());
+
+final eventCalculatorProvider =
+    Provider<EventCalculator>((ref) => const DefaultEventCalculator());
+
+final contactsAllProvider = StreamProvider<List<ContactWithDetails>>(
+  (ref) => ref.watch(contactRepositoryProvider).watchAll(),
+);
+
+/// Today's and tomorrow's events across all contacts.
+final todayTomorrowProvider = Provider<AsyncValue<TodayTomorrow>>((ref) {
+  final calc = ref.watch(eventCalculatorProvider);
+  final today = ref.watch(clockProvider).now();
+  return ref
+      .watch(contactsAllProvider)
+      .whenData((contacts) => TodayTomorrow.build(contacts, today, calc));
 });
