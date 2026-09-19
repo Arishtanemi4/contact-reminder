@@ -48,7 +48,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: drift tables `groups`, `contacts`, `contact_phones`, `contact_events`, `settings` exactly as in PROJECT_PLAN; foreign keys ON with cascade delete; unique `(group_id, position)` where relevant; schema version 1 with `MigrationStrategy`; run `dart run build_runner build`.
 - Done when: generated code compiles; `analyze` clean.
 
-### [ ] 1.4 Repositories + tests
+### [x] 1.4 Repositories + tests
 - Do: `GroupRepository`, `ContactRepository` (create/update/delete/watch by group/search, with phones+events in one transaction), `SettingsRepository`. Validation: first name required, ≥1 phone, ≤3 phones.
 - Tests (in-memory drift): CRUD, cascade delete, search, validation errors, group ordering.
 - Done when: `flutter test` green.
