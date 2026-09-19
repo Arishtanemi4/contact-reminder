@@ -187,7 +187,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ### [x] 7.2 Accessibility & UX pass (labels, tap targets ≥48dp, large-font check, empty/error states, loading states).
 ### [x] 7.3 App icon, app name, splash.
 ### [x] 7.4 Full regression: `flutter analyze`, `flutter test`, `cargo test` (N/A, Phase 6 skipped), manual checklist on Android 12/13/14 (import, add/edit, call/SMS/WhatsApp, Today/Tomorrow, notification after reboot).
-### [ ] 7.5 Release build: R8/minify, signing config (**ask the user; never generate/commit keys without approval**), build AAB/APK, install-test the release artifact.
+### [x] 7.5 Release build: R8/minify, signing config (**ask the user; never generate/commit keys without approval**), build AAB/APK, install-test the release artifact.
 ### [ ] 7.6 Docs: update README (features, how to build, xlsx format with sample), privacy note (data stays on device), known limitations (WhatsApp cannot start calls; OEM background limits).
 - Done when (each): checks in that line pass and are reported to the user.
 
@@ -212,3 +212,10 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 | 2026-09-19 | Primary test device: Samsung Galaxy S24 (SM S921B, Android 16) over USB; SDK at E:\software\Android\Sdk; emulator Pixel_8 (API 34) optional | Device connected, licences accepted |
 | 2026-09-19 | Phase 6 (Rust core) skipped; Dart implementations of `SpreadsheetService`, `EventCalculator`, `PhoneNormalizer` remain the shipped implementations; proceed straight to Phase 7 | User: "Skip Phase 6" |
 | 2026-09-20 | 7.4 manual checklist ticked with 3 known gaps deferred to a later phase/version: genuine 3-sheet import file, WhatsApp-not-installed fallback message, and live midnight-rollover observation | User: "We can flag them for now and test them in later upgrade phases or versions." |
+| 2026-09-20 | New-user empty state (zero groups) has no way to add a first contact without an xlsx import; fix deferred to next version | Found during 7.5 release install-test (fresh install, no debug seed available); User: "Let's flag it and add that in the next version or upgrade." |
+
+## Backlog (next version / upgrade)
+- **No first-contact path on a truly fresh install.** `AppDatabase.onCreate` (`app/lib/data/database.dart:83-86`) seeds only the default `Settings` row, no groups. `ContactsScreen.build` (`app/lib/features/contacts/contacts_screen.dart:20-34`) shows the "Add contact" FAB only inside `_GroupTabs`, which requires `groups.isNotEmpty` — with zero groups the empty state has no FAB and no "add group" affordance, only Import/Export/Template (+debug-only Seed). A release-build first-time user with no xlsx file cannot add a contact. Options to weigh next version: seed default groups (e.g. Friends/Relatives) on `onCreate`, or add a "create group" action to the empty state.
+- Genuine 3-sheet import file test (only a 2-sheet fixture was exercised in 7.4).
+- WhatsApp-not-installed fallback message (only the happy path with WhatsApp installed was tested).
+- Live midnight-rollover observation for Today/Tomorrow (grouping logic verified for fixed dates, not watched across an actual midnight tick).
