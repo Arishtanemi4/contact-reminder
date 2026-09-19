@@ -148,7 +148,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: `workmanager` daily periodic task calling `rebuild()`; boot receiver (`ScheduledNotificationBootReceiver`) config; settings for notify time and lead days.
 - Done when: after `adb reboot`, pending alarms are restored; worker runs (`adb shell cmd jobscheduler run ...` or WorkManager logs).
 
-### [ ] 5.6 Battery-optimisation guidance
+### [x] 5.6 Battery-optimisation guidance
 - Do: settings screen section explaining OEM background limits with button to open battery settings (`disable_battery_optimizations` / app settings intent).
 - Done when: screen present; intent opens on emulator.
 

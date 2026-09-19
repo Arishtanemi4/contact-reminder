@@ -1,3 +1,4 @@
+import 'package:contact_reminder/core/battery_optimization_service.dart';
 import 'package:contact_reminder/core/notification_service.dart';
 import 'package:contact_reminder/core/providers.dart';
 import 'package:contact_reminder/features/settings/settings_screen.dart';
@@ -39,13 +40,36 @@ class _FakeNotificationService extends NotificationService {
       calls.add('showNow:$title:$body');
 }
 
+/// Avoids touching the real platform channel in MainActivity, which isn't
+/// available under `flutter test`.
+class _FakeBatteryOptimizationService extends BatteryOptimizationService {
+  bool ignored = false;
+  final calls = <String>[];
+
+  @override
+  Future<bool> isIgnoringBatteryOptimizations() async => ignored;
+
+  @override
+  Future<void> openSettings() async {
+    calls.add('openSettings');
+    ignored = true;
+  }
+}
+
 void main() {
   late _FakeNotificationService service;
+  late _FakeBatteryOptimizationService batteryService;
 
-  setUp(() => service = _FakeNotificationService());
+  setUp(() {
+    service = _FakeNotificationService();
+    batteryService = _FakeBatteryOptimizationService();
+  });
 
   Widget app() => ProviderScope(
-    overrides: [notificationServiceProvider.overrideWithValue(service)],
+    overrides: [
+      notificationServiceProvider.overrideWithValue(service),
+      batteryOptimizationServiceProvider.overrideWithValue(batteryService),
+    ],
     child: const MaterialApp(home: SettingsScreen()),
   );
 
@@ -117,5 +141,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.calls, ['openSystemSettings']);
+  });
+
+  testWidgets('Open battery settings delegates to the service and refreshes status', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restricted'), findsOneWidget);
+
+    await tester.tap(find.text('Open battery settings'));
+    await tester.pumpAndSettle();
+
+    expect(batteryService.calls, ['openSettings']);
+    expect(find.text('Not restricted'), findsOneWidget);
   });
 }

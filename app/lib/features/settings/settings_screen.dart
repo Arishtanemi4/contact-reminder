@@ -10,7 +10,9 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: ListView(children: const [_NotificationsSection()]),
+      body: ListView(
+        children: const [_NotificationsSection(), _BatterySection()],
+      ),
     );
   }
 }
@@ -125,5 +127,56 @@ class _NotificationsSection extends ConsumerWidget {
         context,
       ).showSnackBar(const SnackBar(content: Text('Test notification sent')));
     }
+  }
+}
+
+/// Explains that some manufacturers (Xiaomi, Oppo, etc.) kill background
+/// apps aggressively, which can delay or drop reminders, and links to the
+/// settings that fix it.
+class _BatterySection extends ConsumerWidget {
+  const _BatterySection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ignoredAsync = ref.watch(batteryOptimizationIgnoredProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Text(
+            'Background reminders',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text(
+            'Some phone manufacturers restrict background apps to save '
+            'battery, which can delay or block reminders. Exempt this app '
+            'from battery optimisation to keep reminders reliable.',
+          ),
+        ),
+        ListTile(
+          title: const Text('Battery optimisation'),
+          subtitle: Text(
+            ignoredAsync.when(
+              data: (ignored) => ignored ? 'Not restricted' : 'Restricted',
+              loading: () => 'Checking…',
+              error: (_, _) => 'Unknown',
+            ),
+          ),
+          trailing: TextButton(
+            onPressed: () => _openBatterySettings(ref),
+            child: const Text('Open battery settings'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openBatterySettings(WidgetRef ref) async {
+    await ref.read(batteryOptimizationServiceProvider).openSettings();
+    ref.invalidate(batteryOptimizationIgnoredProvider);
   }
 }

@@ -6,6 +6,9 @@
     <!-- Exact-time reminders on Android 12+; falls back to inexact alarms if the
          user doesn't grant it (see NotificationService.canScheduleExactAlarms()). -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Lets Settings > "Open battery settings" (Phase 5.6) show the direct
+         "exempt this app" dialog via MainActivity's battery channel. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <application
         android:label="contact_reminder"
         android:name="${applicationName}"

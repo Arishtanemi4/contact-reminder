@@ -11,6 +11,7 @@ import '../features/import_export/import_service.dart';
 import '../features/import_export/spreadsheet_service.dart';
 import '../features/import_export/xlsx_spreadsheet_service.dart';
 import 'action_launcher.dart';
+import 'battery_optimization_service.dart';
 import 'clock.dart';
 import 'notification_scheduler.dart';
 import 'notification_service.dart';
@@ -47,6 +48,17 @@ final notificationsEnabledProvider = FutureProvider<bool>(
 
 final exactAlarmsAllowedProvider = FutureProvider<bool>(
   (ref) => ref.watch(notificationServiceProvider).canScheduleExactAlarms(),
+);
+
+final batteryOptimizationServiceProvider =
+    Provider<BatteryOptimizationService>(
+  (ref) => const BatteryOptimizationService(),
+);
+
+final batteryOptimizationIgnoredProvider = FutureProvider<bool>(
+  (ref) => ref
+      .watch(batteryOptimizationServiceProvider)
+      .isIgnoringBatteryOptimizations(),
 );
 
 final spreadsheetServiceProvider =
