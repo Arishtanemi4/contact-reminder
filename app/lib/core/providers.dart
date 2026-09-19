@@ -4,6 +4,9 @@ import '../data/contact_repository.dart';
 import '../data/database.dart';
 import '../data/group_repository.dart';
 import '../data/settings_repository.dart';
+import '../features/import_export/import_service.dart';
+import '../features/import_export/spreadsheet_service.dart';
+import '../features/import_export/xlsx_spreadsheet_service.dart';
 import 'action_launcher.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -26,6 +29,13 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 
 final actionLauncherProvider =
     Provider<ActionLauncher>((ref) => const ActionLauncher());
+
+final spreadsheetServiceProvider =
+    Provider<SpreadsheetService>((ref) => const XlsxSpreadsheetService());
+
+final importServiceProvider = Provider<ImportService>(
+  (ref) => ImportService(ref.watch(databaseProvider)),
+);
 
 final groupsStreamProvider = StreamProvider<List<Group>>(
   (ref) => ref.watch(groupRepositoryProvider).watchAll(),

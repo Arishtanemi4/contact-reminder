@@ -113,7 +113,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: merge twice = idempotent; replace; rollback on failure.
 - Done when: tests green.
 
-### [ ] 4.5 Import UI
+### [x] 4.5 Import UI
 - Do: `file_picker` (SAF, no storage permission), preview screen (sheets, counts, issues list), choose Merge/Replace, confirm, result summary.
 - Done when: importing a fixture on the emulator creates tabs + contacts; issues visible.
 

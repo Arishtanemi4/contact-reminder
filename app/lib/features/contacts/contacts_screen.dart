@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
+import '../import_export/import_screen.dart';
 import 'contact_actions.dart';
 import 'contact_detail_screen.dart';
 import 'contact_form_screen.dart';
@@ -20,7 +21,7 @@ class ContactsScreen extends ConsumerWidget {
           ? Scaffold(
               appBar: AppBar(
                 title: const Text('Contacts'),
-                actions: const [_SeedButton()],
+                actions: const [_ImportButton(), _SeedButton()],
               ),
               body: const _EmptyState(),
             )
@@ -46,7 +47,7 @@ class _GroupTabs extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
-          actions: const [_SeedButton()],
+          actions: const [_ImportButton(), _SeedButton()],
           bottom: TabBar(
             isScrollable: true,
             tabs: [for (final g in groups) Tab(text: g.name)],
@@ -191,6 +192,21 @@ void _showQuickActions(
       ),
     ),
   );
+}
+
+class _ImportButton extends StatelessWidget {
+  const _ImportButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.upload_file),
+      tooltip: 'Import from .xlsx',
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ImportScreen()),
+      ),
+    );
+  }
 }
 
 class _EmptyState extends StatelessWidget {
