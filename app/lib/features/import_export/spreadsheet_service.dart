@@ -29,6 +29,13 @@ class ParsedEvent {
 
   final String name;
   final ParsedDate date;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ParsedEvent && other.name == name && other.date == date;
+
+  @override
+  int get hashCode => Object.hash(name, date);
 }
 
 /// Why one field of one row couldn't be used, for the per-row report shown
@@ -46,6 +53,16 @@ class RowIssue {
   /// Column the issue applies to, e.g. "Phone 1", "Date of Birth".
   final String field;
   final String reason;
+
+  @override
+  bool operator ==(Object other) =>
+      other is RowIssue &&
+      other.rowNumber == rowNumber &&
+      other.field == field &&
+      other.reason == reason;
+
+  @override
+  int get hashCode => Object.hash(rowNumber, field, reason);
 
   @override
   String toString() => 'Row $rowNumber, $field: $reason';

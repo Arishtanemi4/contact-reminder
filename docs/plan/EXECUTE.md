@@ -103,7 +103,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: table-driven, ≥20 cases.
 - Done when: tests green.
 
-### [ ] 4.3 Dart xlsx parser (import)
+### [x] 4.3 Dart xlsx parser (import)
 - Do: implement with the `excel` package: one sheet → one group; header match case-insensitive/trimmed; required `First Name`, `Phone 1`; per-row issues collected, never dropped silently.
 - Tests: run against every fixture; assert imported rows + issue list.
 - Done when: tests green.
