@@ -144,7 +144,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: unit test scheduling plan (which dates/messages) with fake clock; scheduler behind interface with fake.
 - Done when: tests green; on emulator, set an event for tomorrow, advance via `adb shell` / change time, notification appears (`adb shell dumpsys alarm | findstr contactreminder` shows entries).
 
-### [ ] 5.5 Background top-up & reboot
+### [x] 5.5 Background top-up & reboot
 - Do: `workmanager` daily periodic task calling `rebuild()`; boot receiver (`ScheduledNotificationBootReceiver`) config; settings for notify time and lead days.
 - Done when: after `adb reboot`, pending alarms are restored; worker runs (`adb shell cmd jobscheduler run ...` or WorkManager logs).
 
