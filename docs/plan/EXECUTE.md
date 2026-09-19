@@ -108,7 +108,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: run against every fixture; assert imported rows + issue list.
 - Done when: tests green.
 
-### [ ] 4.4 Import use-case (merge / replace)
+### [x] 4.4 Import use-case (merge / replace)
 - Do: `ImportService` applying parsed data to DB in a single transaction; Merge key = group + first name + surname + phone 1 (normalised); Replace clears then inserts; returns a summary (added/updated/skipped/issues).
 - Tests: merge twice = idempotent; replace; rollback on failure.
 - Done when: tests green.
