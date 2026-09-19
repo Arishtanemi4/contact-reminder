@@ -135,11 +135,11 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: widget test with seeded dates and a fake clock (inject `Clock`).
 - Done when: tests green; manual check.
 
-### [ ] 5.3 Notification permissions & channel
+### [x] 5.3 Notification permissions & channel
 - Do: `flutter_local_notifications`, `timezone`, `flutter_timezone`; manifest permissions (`POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, exact-alarm handling); notification channel; permission request flow with rationale screen; settings page shows status + deep link to system settings.
 - Done when: a "test notification" button in Settings shows a notification on Android 13+ emulator.
 
-### [ ] 5.4 Scheduler
+### [x] 5.4 Scheduler
 - Do: `ReminderScheduler.rebuild()` — cancel all, schedule rolling 30-day window of daily summaries at user time (+ optional day-before); exact alarm if permitted else inexact; call rebuild on: app start, any contact/event change, settings change.
 - Tests: unit test scheduling plan (which dates/messages) with fake clock; scheduler behind interface with fake.
 - Done when: tests green; on emulator, set an event for tomorrow, advance via `adb shell` / change time, notification appears (`adb shell dumpsys alarm | findstr contactreminder` shows entries).
