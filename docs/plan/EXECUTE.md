@@ -82,7 +82,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: ≥15 cases incl. `+91 98765-43210`, `09876543210`, already-E.164, garbage.
 - Done when: tests green; `number_e164` populated on save.
 
-### [ ] 3.2 Call / SMS / WhatsApp launchers
+### [x] 3.2 Call / SMS / WhatsApp launchers
 - Do: `url_launcher`; `tel:` (dialer, no CALL_PHONE permission), `sms:` (+ optional body), `https://wa.me/<digits>?text=`; add `<queries>` for tel/sms/https/WhatsApp in `AndroidManifest.xml`; graceful snackbar if no handler / WhatsApp missing.
 - Tests: URI builder unit tests (encoding, body).
 - Done when: on a device/emulator each button opens the right app with the right number; failure paths show a message.

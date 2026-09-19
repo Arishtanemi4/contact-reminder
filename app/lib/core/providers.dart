@@ -4,6 +4,7 @@ import '../data/contact_repository.dart';
 import '../data/database.dart';
 import '../data/group_repository.dart';
 import '../data/settings_repository.dart';
+import 'action_launcher.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
@@ -22,6 +23,9 @@ final contactRepositoryProvider = Provider<ContactRepository>(
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepository(ref.watch(databaseProvider)),
 );
+
+final actionLauncherProvider =
+    Provider<ActionLauncher>((ref) => const ActionLauncher());
 
 final groupsStreamProvider = StreamProvider<List<Group>>(
   (ref) => ref.watch(groupRepositoryProvider).watchAll(),
