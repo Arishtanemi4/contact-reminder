@@ -40,7 +40,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: `flutter create --org <org> --project-name contact_reminder --platforms android app`; set minSdk 23 (raise to what plugins need), compileSdk latest; remove template counter code.
 - Done when: `flutter analyze` clean; `flutter run` shows a blank Material 3 app on emulator.
 
-### [ ] 1.2 Dependencies & folder skeleton
+### [x] 1.2 Dependencies & folder skeleton
 - Do: add `flutter_riverpod`, `drift`, `drift_flutter` (or `sqlite3_flutter_libs`), `path_provider`, `path`; dev: `drift_dev`, `build_runner`, `flutter_lints`. Create `lib/{core,data,features/{contacts,events,import_export,settings}}`.
 - Done when: `flutter pub get` OK; `flutter analyze` clean.
 
