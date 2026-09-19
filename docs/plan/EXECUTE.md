@@ -60,7 +60,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: `MaterialApp` (M3, light/dark), Riverpod `ProviderScope`, bottom nav/drawer: Contacts, Today, Settings (placeholders).
 - Done when: app runs; navigation works; dark mode follows system.
 
-### [ ] 2.2 Group tabs + contact list
+### [x] 2.2 Group tabs + contact list
 - Do: `TabBar` built from `groups` stream; per-tab list with search; empty state ("Import a file or add a contact"); seed-data debug helper (debug builds only).
 - Tests: widget test with seeded in-memory DB shows tabs and list; search filters.
 - Done when: tests green; manually verified on emulator.
