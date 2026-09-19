@@ -87,7 +87,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Tests: URI builder unit tests (encoding, body).
 - Done when: on a device/emulator each button opens the right app with the right number; failure paths show a message.
 
-### [ ] 3.3 Wire actions into UI
+### [x] 3.3 Wire actions into UI
 - Do: buttons on detail screen per phone; long-press/swipe quick actions on list tiles.
 - Done when: manual check of all three actions from list and detail.
 

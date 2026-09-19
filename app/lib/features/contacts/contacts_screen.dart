@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
+import 'contact_actions.dart';
 import 'contact_detail_screen.dart';
 import 'contact_form_screen.dart';
 
@@ -81,11 +82,13 @@ class _GroupTabs extends ConsumerWidget {
               animation: controller,
               builder: (context, _) => FloatingActionButton(
                 tooltip: 'Add contact',
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => ContactFormScreen(
-                    initialGroupId: groups[controller.index].id,
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ContactFormScreen(
+                      initialGroupId: groups[controller.index].id,
+                    ),
                   ),
-                )),
+                ),
                 child: const Icon(Icons.add),
               ),
             );
@@ -111,18 +114,28 @@ class _GroupContactList extends ConsumerWidget {
               itemCount: contacts.length,
               itemBuilder: (context, index) {
                 final details = contacts[index];
-                final name = [details.contact.firstName, details.contact.surname]
-                    .whereType<String>()
-                    .join(' ');
+                final name = [
+                  details.contact.firstName,
+                  details.contact.surname,
+                ].whereType<String>().join(' ');
                 return ListTile(
                   title: Text(name),
                   subtitle: details.phones.isEmpty
                       ? null
                       : Text(details.phones.first.numberRaw),
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) =>
-                        ContactDetailScreen(contactId: details.contact.id),
-                  )),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ContactDetailScreen(contactId: details.contact.id),
+                    ),
+                  ),
+                  onLongPress: details.phones.isEmpty
+                      ? null
+                      : () => _showQuickActions(
+                          context,
+                          ref,
+                          details.phones.first,
+                        ),
                 );
               },
             ),
@@ -130,6 +143,54 @@ class _GroupContactList extends ConsumerWidget {
       error: (error, stack) => Center(child: Text('Error: $error')),
     );
   }
+}
+
+/// Bottom sheet with call/SMS/WhatsApp actions for one phone, opened from a
+/// long-pressed list tile.
+void _showQuickActions(
+  BuildContext context,
+  WidgetRef ref,
+  ContactPhone phone,
+) {
+  final number = phone.numberE164 ?? phone.numberRaw;
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.call),
+            title: const Text('Call'),
+            onTap: () {
+              Navigator.pop(sheetContext);
+              runContactAction(context, ref, 'Call', (l) => l.call(number));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.sms),
+            title: const Text('SMS'),
+            onTap: () {
+              Navigator.pop(sheetContext);
+              runContactAction(context, ref, 'SMS', (l) => l.sms(number));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.chat),
+            title: const Text('WhatsApp'),
+            onTap: () {
+              Navigator.pop(sheetContext);
+              runContactAction(
+                context,
+                ref,
+                'WhatsApp',
+                (l) => l.whatsApp(number),
+              );
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _EmptyState extends StatelessWidget {
@@ -170,18 +231,22 @@ class _SeedButton extends ConsumerWidget {
     final contacts = ref.read(contactRepositoryProvider);
     final friends = await groups.create('Friends');
     final office = await groups.create('Office');
-    await contacts.create(ContactInput(
-      groupId: friends.id,
-      firstName: 'Asha',
-      surname: 'Kulkarni',
-      phones: const ['+91 98765 43210'],
-      events: const [EventInput(type: EventType.birthday, month: 5, day: 12)],
-    ));
-    await contacts.create(ContactInput(
-      groupId: office.id,
-      firstName: 'Rahul',
-      phones: const ['+91 91234 56789'],
-    ));
+    await contacts.create(
+      ContactInput(
+        groupId: friends.id,
+        firstName: 'Asha',
+        surname: 'Kulkarni',
+        phones: const ['+91 98765 43210'],
+        events: const [EventInput(type: EventType.birthday, month: 5, day: 12)],
+      ),
+    );
+    await contacts.create(
+      ContactInput(
+        groupId: office.id,
+        firstName: 'Rahul',
+        phones: const ['+91 91234 56789'],
+      ),
+    );
     if (context.mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Demo data added')));

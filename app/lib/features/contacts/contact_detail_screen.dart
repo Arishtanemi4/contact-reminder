@@ -4,11 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../data/contact_repository.dart';
 import '../../data/database.dart';
+import 'contact_actions.dart';
 import 'contact_form_screen.dart';
 
 const _monthNames = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 class ContactDetailScreen extends ConsumerWidget {
@@ -42,8 +53,10 @@ class _Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contact = details.contact;
-    final name =
-        [contact.firstName, contact.surname].whereType<String>().join(' ');
+    final name = [
+      contact.firstName,
+      contact.surname,
+    ].whereType<String>().join(' ');
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
@@ -51,12 +64,14 @@ class _Detail extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: 'Edit',
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => ContactFormScreen(
-                contactId: contact.id,
-                initialGroupId: contact.groupId,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => ContactFormScreen(
+                  contactId: contact.id,
+                  initialGroupId: contact.groupId,
+                ),
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -65,24 +80,29 @@ class _Detail extends StatelessWidget {
           for (final phone in details.phones) _PhoneTile(phone: phone),
           for (final event in details.events) _EventTile(event: event),
           if (contact.email != null)
-            ListTile(leading: const Icon(Icons.email), title: Text(contact.email!)),
+            ListTile(
+              leading: const Icon(Icons.email),
+              title: Text(contact.email!),
+            ),
           if (contact.address != null)
             ListTile(
-                leading: const Icon(Icons.location_on),
-                title: Text(contact.address!)),
+              leading: const Icon(Icons.location_on),
+              title: Text(contact.address!),
+            ),
         ],
       ),
     );
   }
 }
 
-class _PhoneTile extends StatelessWidget {
+class _PhoneTile extends ConsumerWidget {
   const _PhoneTile({required this.phone});
 
   final ContactPhone phone;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final number = phone.numberE164 ?? phone.numberRaw;
     return ListTile(
       leading: const Icon(Icons.phone),
       title: Text(phone.numberRaw),
@@ -92,26 +112,27 @@ class _PhoneTile extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.call),
             tooltip: 'Call',
-            onPressed: () => _stub(context, 'Call'),
+            onPressed: () =>
+                runContactAction(context, ref, 'Call', (l) => l.call(number)),
           ),
           IconButton(
             icon: const Icon(Icons.sms),
             tooltip: 'SMS',
-            onPressed: () => _stub(context, 'SMS'),
+            onPressed: () =>
+                runContactAction(context, ref, 'SMS', (l) => l.sms(number)),
           ),
           IconButton(
             icon: const Icon(Icons.chat),
             tooltip: 'WhatsApp',
-            onPressed: () => _stub(context, 'WhatsApp'),
+            onPressed: () => runContactAction(
+              context,
+              ref,
+              'WhatsApp',
+              (l) => l.whatsApp(number),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  void _stub(BuildContext context, String action) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$action: coming soon')),
     );
   }
 }
@@ -129,8 +150,8 @@ class _EventTile extends StatelessWidget {
     final suffix = years == null
         ? ''
         : event.type == EventType.birthday
-            ? ' · Age $years'
-            : ' · $years years';
+        ? ' · Age $years'
+        : ' · $years years';
     return ListTile(
       leading: Icon(switch (event.type) {
         EventType.birthday => Icons.cake,
@@ -143,8 +164,8 @@ class _EventTile extends StatelessWidget {
   }
 
   String _typeLabel(EventType type) => switch (type) {
-        EventType.birthday => 'Birthday',
-        EventType.anniversary => 'Anniversary',
-        EventType.other => 'Event',
-      };
+    EventType.birthday => 'Birthday',
+    EventType.anniversary => 'Anniversary',
+    EventType.other => 'Event',
+  };
 }

@@ -1,3 +1,4 @@
+import 'package:contact_reminder/core/action_launcher.dart';
 import 'package:contact_reminder/core/providers.dart';
 import 'package:contact_reminder/data/contact_repository.dart';
 import 'package:contact_reminder/data/database.dart';
@@ -19,6 +20,31 @@ Future<void> _unmountAndSettle(WidgetTester tester) async {
   await tester.pump(Duration.zero);
 }
 
+/// Records calls instead of hitting the real platform (there's no
+/// url_launcher implementation under `flutter test`, and we don't want tests
+/// to attempt a real call/SMS/WhatsApp launch).
+class _FakeActionLauncher extends ActionLauncher {
+  final calls = <String>[];
+
+  @override
+  Future<bool> call(String e164Number) async {
+    calls.add('call:$e164Number');
+    return true;
+  }
+
+  @override
+  Future<bool> sms(String e164Number, {String? body}) async {
+    calls.add('sms:$e164Number');
+    return true;
+  }
+
+  @override
+  Future<bool> whatsApp(String e164Number, {String? text}) async {
+    calls.add('whatsApp:$e164Number');
+    return true;
+  }
+}
+
 void main() {
   late AppDatabase db;
 
@@ -28,32 +54,42 @@ void main() {
     final contacts = ContactRepository(db);
     final friendsId = (await groups.create('Friends')).id;
     final officeId = (await groups.create('Office')).id;
-    await contacts.create(ContactInput(
-      groupId: friendsId,
-      firstName: 'Asha',
-      phones: const ['111'],
-    ));
-    await contacts.create(ContactInput(
-      groupId: friendsId,
-      firstName: 'Rahul',
-      phones: const ['222'],
-    ));
-    await contacts.create(ContactInput(
-      groupId: officeId,
-      firstName: 'Priya',
-      phones: const ['333'],
-    ));
+    await contacts.create(
+      ContactInput(
+        groupId: friendsId,
+        firstName: 'Asha',
+        phones: const ['111'],
+      ),
+    );
+    await contacts.create(
+      ContactInput(
+        groupId: friendsId,
+        firstName: 'Rahul',
+        phones: const ['222'],
+      ),
+    );
+    await contacts.create(
+      ContactInput(
+        groupId: officeId,
+        firstName: 'Priya',
+        phones: const ['333'],
+      ),
+    );
   });
 
   tearDown(() => db.close());
 
-  Widget app() => ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(db)],
-        child: const MaterialApp(home: ContactsScreen()),
-      );
+  Widget app({ActionLauncher? launcher}) => ProviderScope(
+    overrides: [
+      databaseProvider.overrideWithValue(db),
+      if (launcher != null) actionLauncherProvider.overrideWithValue(launcher),
+    ],
+    child: const MaterialApp(home: ContactsScreen()),
+  );
 
-  testWidgets('shows a tab per group and that group\'s contacts',
-      (tester) async {
+  testWidgets('shows a tab per group and that group\'s contacts', (
+    tester,
+  ) async {
     await tester.pumpWidget(app());
     await tester.pumpAndSettle();
 
@@ -82,6 +118,24 @@ void main() {
     await _unmountAndSettle(tester);
   });
 
+  testWidgets('long-press on a contact shows quick call/SMS/WhatsApp actions', (
+    tester,
+  ) async {
+    final launcher = _FakeActionLauncher();
+    await tester.pumpWidget(app(launcher: launcher));
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Asha'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Call'));
+    await tester.pumpAndSettle();
+
+    expect(launcher.calls.single, startsWith('call:'));
+
+    await _unmountAndSettle(tester);
+  });
+
   group('empty database', () {
     late AppDatabase emptyDb;
 
@@ -89,10 +143,12 @@ void main() {
     tearDown(() => emptyDb.close());
 
     testWidgets('shows the empty state', (tester) async {
-      await tester.pumpWidget(ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(emptyDb)],
-        child: const MaterialApp(home: ContactsScreen()),
-      ));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(emptyDb)],
+          child: const MaterialApp(home: ContactsScreen()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Import a file or add a contact.'), findsOneWidget);
