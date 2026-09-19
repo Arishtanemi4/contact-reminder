@@ -77,7 +77,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ---
 
 ## Phase 3 – Actions (Milestone 3)
-### [ ] 3.1 Phone number normalisation
+### [x] 3.1 Phone number normalisation
 - Do: `PhoneNormalizer` (default country code from settings, strips spaces/dashes, handles leading 0 / +). Prefer `phone_numbers_parser` package; wrap behind an interface (Rust replacement later).
 - Tests: ≥15 cases incl. `+91 98765-43210`, `09876543210`, already-E.164, garbage.
 - Done when: tests green; `number_e164` populated on save.

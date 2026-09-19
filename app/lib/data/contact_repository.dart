@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../core/phone_normalizer.dart';
 import 'database.dart';
 
 class ValidationException implements Exception {
@@ -57,12 +58,15 @@ class ContactWithDetails {
 }
 
 class ContactRepository {
-  ContactRepository(this._db);
+  ContactRepository(this._db,
+      {this._phoneNormalizer = const DefaultPhoneNormalizer()});
 
   final AppDatabase _db;
+  final PhoneNormalizer _phoneNormalizer;
 
-  Future<int> create(ContactInput input) {
+  Future<int> create(ContactInput input) async {
     final phones = _validate(input);
+    final region = (await _db.select(_db.settings).getSingle()).defaultCountryCode;
     return _db.transaction(() async {
       final now = DateTime.now();
       final id = await _db.into(_db.contacts).insert(ContactsCompanion.insert(
@@ -74,14 +78,15 @@ class ContactRepository {
             createdAt: now,
             updatedAt: now,
           ));
-      await _insertChildren(id, phones, input.events);
+      await _insertChildren(id, phones, input.events, region);
       return id;
     });
   }
 
   /// Replaces phones and events; always touches the contacts row so watchers fire.
-  Future<void> update(int id, ContactInput input) {
+  Future<void> update(int id, ContactInput input) async {
     final phones = _validate(input);
+    final region = (await _db.select(_db.settings).getSingle()).defaultCountryCode;
     return _db.transaction(() async {
       await (_db.update(_db.contacts)..where((c) => c.id.equals(id))).write(
         ContactsCompanion(
@@ -99,7 +104,7 @@ class ContactRepository {
       await (_db.delete(_db.contactEvents)
             ..where((e) => e.contactId.equals(id)))
           .go();
-      await _insertChildren(id, phones, input.events);
+      await _insertChildren(id, phones, input.events, region);
     });
   }
 
@@ -182,13 +187,14 @@ class ContactRepository {
     ];
   }
 
-  Future<void> _insertChildren(
-      int contactId, List<String> phones, List<EventInput> events) async {
+  Future<void> _insertChildren(int contactId, List<String> phones,
+      List<EventInput> events, String defaultRegion) async {
     for (var i = 0; i < phones.length; i++) {
       await _db.into(_db.contactPhones).insert(ContactPhonesCompanion.insert(
             contactId: contactId,
             position: i + 1,
             numberRaw: phones[i],
+            numberE164: Value(_phoneNormalizer.normalize(phones[i], defaultRegion)),
           ));
     }
     for (final e in events) {

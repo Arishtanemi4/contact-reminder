@@ -56,6 +56,14 @@ void main() {
           isNull);
     });
 
+    test('create populates numberE164 using the default region', () async {
+      final id = await contacts
+          .create(input(phones: ['098765 43210', 'not a number']));
+      final c = (await contacts.get(id))!;
+      expect(c.phones[0].numberE164, '+919876543210');
+      expect(c.phones[1].numberE164, isNull);
+    });
+
     test('update replaces phones and events', () async {
       final id = await contacts.create(input(
         events: const [EventInput(type: EventType.birthday, month: 1, day: 2)],
