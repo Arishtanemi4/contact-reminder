@@ -69,7 +69,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 - Do: shows name, phones, events (age/years shown only if year known), email, address; action buttons are stubs for now.
 - Done when: widget test + manual check.
 
-### [ ] 2.4 Add / Edit form
+### [x] 2.4 Add / Edit form
 - Do: form with validation; up to 3 phones; date picker with "no year" toggle for DOB, anniversary, other events (dynamic list); group picker with "new group"; delete with confirm.
 - Tests: validation (missing first name/phone), saving with/without year, edit round-trip.
 - Done when: tests green; add→list→edit→delete works on emulator.
