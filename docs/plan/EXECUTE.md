@@ -185,7 +185,7 @@ Companion to `PROJECT_PLAN.md` (the *what*). This file is the *how, in order*.
 ## Phase 7 – Polish & release (Milestone 7)
 ### [x] 7.1 Settings screen completion (notify time, lead days, default country code, theme).
 ### [x] 7.2 Accessibility & UX pass (labels, tap targets ≥48dp, large-font check, empty/error states, loading states).
-### [ ] 7.3 App icon, app name, splash.
+### [x] 7.3 App icon, app name, splash.
 ### [ ] 7.4 Full regression: `flutter analyze`, `flutter test`, `cargo test`, manual checklist on Android 12/13/14 (import, add/edit, call/SMS/WhatsApp, Today/Tomorrow, notification after reboot).
 ### [ ] 7.5 Release build: R8/minify, signing config (**ask the user; never generate/commit keys without approval**), build AAB/APK, install-test the release artifact.
 ### [ ] 7.6 Docs: update README (features, how to build, xlsx format with sample), privacy note (data stays on device), known limitations (WhatsApp cannot start calls; OEM background limits).

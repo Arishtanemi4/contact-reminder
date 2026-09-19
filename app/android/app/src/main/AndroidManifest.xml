@@ -10,7 +10,7 @@
          "exempt this app" dialog via MainActivity's battery channel. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <application
-        android:label="contact_reminder"
+        android:label="Contact Reminder"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
